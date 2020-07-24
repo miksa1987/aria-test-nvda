@@ -1,24 +1,53 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+const Container = ({items}) => 
+  <ul aria-live="polite">
+    {items.map((item, i) => <Item key={i} item={item} />)}
+  </ul>
+
+const Item = ({ item}) => {
+  const random = Math.random() * 10
+  const shouldBeHidden = random < 3
+
+  return (
+    <li aria-hidden={shouldBeHidden}>
+      <div>
+        <span>
+          <div>
+            <p aria-hidden="true">{item.text}</p>
+            <p aria-hidden="false" style={{ display: 'none'}}>{item.text} hoohooo</p>
+          </div>
+        </span>
+      </div>
+    </li>
+  )
+}
 
 function App() {
+  const [containers, setContainers] = React.useState([[ { text: 'hii'}]])
+  const limit = 50;
+
+  const addItem = React.useCallback(() => {
+    const containerItemNum = containers[containers.length -1].length
+
+    if (containerItemNum >= limit) {
+      const containerToAdd = [ { text: 'hii' } ]
+      setContainers([ ...containers, containerToAdd])
+    } else {
+      const lastContainerIndex = containers.length -1
+        const updatedContainer = [ ...containers[lastContainerIndex], { text: Math.random() } ]
+        const mappedContainers = containers.map((container, i) => i === lastContainerIndex ? updatedContainer : container)
+        setContainers(mappedContainers)
+    }
+  }, [containers, setContainers])
+  
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button onClick={addItem}>ADD</button>
+      <div>
+        {containers.map((container, i) => <Container key={i} items={container} />)}
+      </div>
     </div>
   );
 }
